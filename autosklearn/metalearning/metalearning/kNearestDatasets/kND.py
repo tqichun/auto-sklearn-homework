@@ -121,11 +121,25 @@ class KNearestDatasets(object):
             print(f"[WARNING] dataset_name {dataset_name} do not exist in csvDataDissimMatrix(dataset).csv, "
                   f"using default method")
             # dataset_name = valid_dataset_name.tolist()[np.random.randint(0, valid_dataset_name.size)]
+            X_train = self.scaler.transform(self.metafeatures)
+            x = x.values.reshape((1, -1))
+            x = self.scaler.transform(x)
+            self._nearest_neighbors.fit(X_train)
+            distances_, neighbor_indices = self._nearest_neighbors.kneighbors(
+                x, n_neighbors=k, return_distance=True)
 
+            assert k == neighbor_indices.shape[1]
+
+            rval = [self.metafeatures.index[i]
+                    # Neighbor indices is 2d, each row is the indices for one
+                    # dataset in x.
+                    for i in neighbor_indices[0]]
+
+            if return_distance is False:
+                return rval
+            else:
+                return rval, distances_[0]
         assert type(x) == pd.Series
-        X_train = self.scaler.transform(self.metafeatures)
-        x = x.values.reshape((1, -1))
-        x = self.scaler.transform(x)
         # self._nearest_neighbors.fit(X_train)
         arr = np.array(matrix[dataset_name])
         if arr.ndim >= 2:

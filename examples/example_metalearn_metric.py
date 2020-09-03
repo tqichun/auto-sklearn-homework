@@ -9,11 +9,9 @@ The following example shows how to fit a simple classification model with
 """
 import os
 
-import sklearn.datasets
 import sklearn.metrics
 
 import autosklearn.classification
-
 
 ############################################################################
 # Data Loading
@@ -24,7 +22,7 @@ X_train, X_test, y_train, y_test = \
     sklearn.model_selection.train_test_split(X, y, random_state=1)
 
 ############################################################################
-# Build and fit a regressor
+# Build and fit a classifier
 # =========================
 os.system('rm -rf /tmp/autosklearn_classification_example*')
 automl = autosklearn.classification.AutoSklearnClassifier(
@@ -33,7 +31,7 @@ automl = autosklearn.classification.AutoSklearnClassifier(
     tmp_folder='/tmp/autosklearn_classification_example_tmp',
     output_folder='/tmp/autosklearn_classification_example_out',
 )
-automl.fit(X_train, y_train, dataset_name='fuck')
+automl.fit(X_train, y_train, dataset_name='2')
 
 ############################################################################
 # Print the final ensemble constructed by auto-sklearn
@@ -46,4 +44,4 @@ print(automl.show_models())
 # ===================================
 
 predictions = automl.predict(X_test)
-print("R2 score:", sklearn.metrics.accuracy_score(y_test, predictions))
+print("acc score:", sklearn.metrics.accuracy_score(y_test, predictions))
