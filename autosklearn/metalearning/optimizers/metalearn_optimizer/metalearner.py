@@ -121,6 +121,7 @@ class MetaLearningOptimizer(object):
             dataset_metafeatures,
             k=-1,
             exclude_double_configurations=exclude_double_configurations,
+            dataset_name=self.dataset_name # add dataset_name
             )
 
     def _split_metafeature_array(self):

@@ -1,9 +1,11 @@
+import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-
+import sklearn.utils
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import MinMaxScaler
-import sklearn.utils
 
 from ....util.logging_ import get_logger
 
@@ -78,7 +80,7 @@ class KNearestDatasets(object):
             leaf_size=30, metric=self._metric, p=self._p,
             metric_params=self.metric_params)
 
-    def kNearestDatasets(self, x, k=1, return_distance=False):
+    def kNearestDatasets(self, x, k=1, return_distance=False, dataset_name=None):  # add dataset_name
         """Return the k most similar datasets with respect to self.metric
 
         Parameters
@@ -101,37 +103,49 @@ class KNearestDatasets(object):
         list
             Sorted distances. Only returned if return_distances is set to True.
         """
-        assert type(x) == pd.Series
-        if k < -1 or k == 0:
-            raise ValueError('Number of neighbors k cannot be zero or negative.')
-        elif k == -1:
-            k = self.num_datasets
+        matric_csv_path = Path(__file__).parent / "csvDataDissimMatrix(dataset).csv"
+        task2dataset_path = Path(__file__).parent / "task2dataset.json"
+        task2dataset = json.loads(Path(task2dataset_path).read_text())
+        task_ids = pd.Series(self.metafeatures.index)
+        dataset_ids = task_ids.map(task2dataset)
+        dataset_ids.dropna(inplace=True)
+        matrix = pd.read_csv(matric_csv_path, index_col=0)
+        matrix.index = matrix.index.astype(str)
+        matrix.columns = matrix.index
+        valid_dataset_ids = np.intersect1d(dataset_ids, matrix.index)
+        matrix = matrix.loc[valid_dataset_ids, :]
+        valid_dataset_name = np.unique(matrix.columns)
+        if not isinstance(dataset_name, str):
+            assert ValueError(f'dataset_name {dataset_name} should be str type.')
+        if dataset_name not in valid_dataset_name:
+            print(f"[WARNING] dataset_name {dataset_name} do not exist in csvDataDissimMatrix(dataset).csv, "
+                  f"using default method")
+            # dataset_name = valid_dataset_name.tolist()[np.random.randint(0, valid_dataset_name.size)]
 
+        assert type(x) == pd.Series
         X_train = self.scaler.transform(self.metafeatures)
         x = x.values.reshape((1, -1))
         x = self.scaler.transform(x)
-        self._nearest_neighbors.fit(X_train)
-        distances, neighbor_indices = self._nearest_neighbors.kneighbors(
-            x, n_neighbors=k, return_distance=True)
-
-        assert k == neighbor_indices.shape[1]
-
-        rval = [self.metafeatures.index[i]
-                # Neighbor indices is 2d, each row is the indices for one
-                # dataset in x.
-                for i in neighbor_indices[0]]
-
+        # self._nearest_neighbors.fit(X_train)
+        arr = np.array(matrix[dataset_name])
+        if arr.ndim >= 2:
+            arr = arr[:, 0]
+        rval = np.argsort(arr)
+        distances = np.array(arr)
+        distances.sort()
+        rval = self.metafeatures.index[rval]
         if return_distance is False:
             return rval
         else:
-            return rval, distances[0]
+            return rval, distances
 
-    def kBestSuggestions(self, x, k=1, exclude_double_configurations=True):
+    def kBestSuggestions(self, x, k=1, exclude_double_configurations=True, dataset_name=None):  # add dataset_name
         assert type(x) == pd.Series
         if k < -1 or k == 0:
             raise ValueError('Number of neighbors k cannot be zero or negative.')
         nearest_datasets, distances = self.kNearestDatasets(x, -1,
-                                                            return_distance=True)
+                                                            return_distance=True,
+                                                            dataset_name=dataset_name)  # add dataset_name
 
         kbest = []
 
@@ -155,6 +169,5 @@ class KNearestDatasets(object):
             if k != -1 and len(kbest) >= k:
                 break
 
-        if k == -1:
-            k = len(kbest)
+        k = 25
         return kbest[:k]
