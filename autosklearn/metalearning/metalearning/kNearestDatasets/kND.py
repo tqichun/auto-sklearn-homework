@@ -125,6 +125,8 @@ class KNearestDatasets(object):
             x = x.values.reshape((1, -1))
             x = self.scaler.transform(x)
             self._nearest_neighbors.fit(X_train)
+            if k==-1:
+                k=X_train.shape[0]
             distances_, neighbor_indices = self._nearest_neighbors.kneighbors(
                 x, n_neighbors=k, return_distance=True)
 
