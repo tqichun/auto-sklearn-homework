@@ -118,8 +118,8 @@ class KNearestDatasets(object):
         if not isinstance(dataset_name, str):
             assert ValueError(f'dataset_name {dataset_name} should be str type.')
         if dataset_name not in valid_dataset_name:
-            print(f"[WARNING] dataset_name {dataset_name} do not exist in csvDataDissimMatrix(dataset).csv, "
-                  f"using default method")
+            # print(f"[WARNING] dataset_name {dataset_name} do not exist in csvDataDissimMatrix(dataset).csv, "
+            #       f"using default method")
             # dataset_name = valid_dataset_name.tolist()[np.random.randint(0, valid_dataset_name.size)]
             X_train = self.scaler.transform(self.metafeatures)
             x = x.values.reshape((1, -1))
