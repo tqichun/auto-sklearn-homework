@@ -112,9 +112,9 @@ class KNearestDatasets(object):
         matrix = pd.read_csv(matric_csv_path, index_col=0)
         matrix.index = matrix.index.astype(str)
         matrix.columns = matrix.index
-        valid_dataset_ids = np.intersect1d(dataset_ids, matrix.index)
+        valid_dataset_ids = np.intersect1d(dataset_ids, matrix.index) # 77个交集
         matrix = matrix.loc[valid_dataset_ids, :]
-        valid_dataset_name = np.unique(matrix.columns)
+        valid_dataset_name = np.unique(matrix.columns) # 800个
         if not isinstance(dataset_name, str):
             assert ValueError(f'dataset_name {dataset_name} should be str type.')
         if dataset_name not in valid_dataset_name:
