@@ -1,0 +1,14 @@
+{
+    "origin": {
+        "accuracy_score": 0.5120481927710844,
+        "recall_score": 0.7037037037037037,
+        "f1_score": 0.5846153846153846,
+        "precision_score": 0.5
+    },
+    "use_matrix": {
+        "accuracy_score": 0.5120481927710844,
+        "recall_score": 0.7160493827160493,
+        "f1_score": 0.5888324873096445,
+        "precision_score": 0.5
+    }
+}
