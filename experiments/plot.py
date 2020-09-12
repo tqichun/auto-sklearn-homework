@@ -18,19 +18,19 @@ for file in os.listdir(prefix):
     summary[name] = data
 
 name2yidx = dict(zip(summary.keys(), range(1, len(summary.keys()) + 1)))
-m2style={
-    "origin":{
-        "c":"b",
+m2style = {
+    "origin": {
+        "c": "b",
         "marker": "o"
     },
-    "use_matrix":{
+    "use_matrix": {
         "c": "r",
         "marker": "s"
     }
 }
 plt.rcParams['figure.figsize'] = (15, 9)
-for i,metric in enumerate(summary['diabetes']['origin'].keys()):
-    plt.subplot(2,2,i+1)
+for i, metric in enumerate(summary['diabetes']['origin'].keys()):
+    plt.subplot(2, 2, i + 1)
     for method_alias, method in [("origin", "l1-knn"), ("use_matrix", "dissim-matrix")]:
         x = []  # metric(performance)
         y = []  # dataset_names
@@ -39,7 +39,7 @@ for i,metric in enumerate(summary['diabetes']['origin'].keys()):
             x.append(summary[name][method_alias][metric])
             y.append(name2yidx[name])
         plt.yticks(range(1, len(names) + 1), names + [""])
-        plt.scatter(x,y,label=method,alpha=0.5,**m2style[method_alias])
+        plt.scatter(x, y, label=method, alpha=0.5, **m2style[method_alias])
         plt.title(metric)
         plt.legend(loc="best")
     plt.grid(alpha=0.5)
