@@ -33,14 +33,15 @@ def load_dataset(dataset_id):
     for col in obj_cols:
         mask = ~pd.isna(df[col])
         df[col][mask] = LabelEncoder().fit_transform(df[col][mask])
-    y = LabelEncoder().fit_transform(y)
+    le = LabelEncoder()
+    y = le.fit_transform(y)
     df = df.astype(float)
-    return df.values, y, cat
+    return df.values, y, cat, le
 
 
 dataset_id = 2
 
-X, y, cat = load_dataset(dataset_id)
+X, y, cat, le = load_dataset(dataset_id)
 
 feat_type = ["Categorical" if c else "Numerical" for c in cat]
 
@@ -70,7 +71,16 @@ print(automl.show_models())
 # ===================================
 
 predictions = automl.predict(X_test)
-pd.DataFrame({"y_test": y_test, "y_pred": predictions}).to_csv(f"{dataset_id}_results.csv", index=False)
+# 是否显示每个类别的名字
+label_name = True
+if label_name:
+    pd.DataFrame(
+        {"y_test": le.inverse_transform(y_test[:, None]), "y_pred": le.inverse_transform(predictions[:, None])}) \
+        .to_csv(f"{dataset_id}_results.csv", index=False)
+else:
+    pd.DataFrame(
+        {"y_test": y_test, "y_pred": predictions}) \
+        .to_csv(f"{dataset_id}_results.csv", index=False)
 is_binary = type_of_target(y) == "binary"
 print("acc score:", sklearn.metrics.accuracy_score(y_test, predictions))
 if is_binary:
