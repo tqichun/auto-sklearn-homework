@@ -78,8 +78,7 @@ if label_name:
         {"y_test": le.inverse_transform(y_test[:, None]), "y_pred": le.inverse_transform(predictions[:, None])}) \
         .to_csv(f"{dataset_id}_results.csv", index=False)
 else:
-    pd.DataFrame(
-        {"y_test": y_test, "y_pred": predictions}) \
+    pd.DataFrame({"y_test": y_test, "y_pred": predictions}) \
         .to_csv(f"{dataset_id}_results.csv", index=False)
 is_binary = type_of_target(y) == "binary"
 print("acc score:", sklearn.metrics.accuracy_score(y_test, predictions))
