@@ -13,6 +13,7 @@ import openml
 import pandas as pd
 import sklearn.metrics
 from sklearn.preprocessing import LabelEncoder
+from sklearn.utils.multiclass import type_of_target
 
 import autosklearn.classification
 
@@ -69,6 +70,9 @@ print(automl.show_models())
 # ===================================
 
 predictions = automl.predict(X_test)
+pd.DataFrame({"y_test": y_test, "y_pred": predictions}).to_csv(f"{dataset_id}_results.csv", index=False)
+is_binary = type_of_target(y) == "binary"
 print("acc score:", sklearn.metrics.accuracy_score(y_test, predictions))
-print("recall score:", sklearn.metrics.recall_score(y_test, predictions))
-print("f1 score:", sklearn.metrics.f1_score(y_test, predictions))
+if is_binary:
+    print("recall score:", sklearn.metrics.recall_score(y_test, predictions))
+    print("f1 score:", sklearn.metrics.f1_score(y_test, predictions))
